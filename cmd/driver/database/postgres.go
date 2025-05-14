@@ -43,7 +43,11 @@ func Connect(cfg *configs.Config) {
 	db.Logger = logger.Default.LogMode(logger.Info)
 	log.Println("running migrations")
 	// Migrate the schema
-	db.AutoMigrate(&entities.Account{})
+	db.AutoMigrate(&entities.Account{},
+		entities.Chat{},
+		entities.Research{},
+		entities.Thumbnail{},
+	)
 
 	DB = Dbinstance{
 		Db: db,

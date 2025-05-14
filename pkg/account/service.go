@@ -1,7 +1,12 @@
 package account
 
 import (
+	"fmt"
+	"time"
+
+	"github.com/Ratchaphon1412/assistant-llm/configs"
 	"github.com/Ratchaphon1412/assistant-llm/pkg/entities"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 type Service interface {
@@ -11,6 +16,7 @@ type Service interface {
 	GetAccountByID(id uint) (*entities.Account, error)
 	GetAccountByEmail(email string) (*entities.Account, error)
 	GetAllAccounts() ([]entities.Account, error)
+	SignIn(account *entities.Account, cfg configs.Config) (string, error)
 }
 
 type service struct {
@@ -21,6 +27,19 @@ func NewService(repo Repository) Service {
 	return &service{
 		repository: repo,
 	}
+}
+
+func (s *service) SignIn(account *entities.Account, cfg configs.Config) (string, error) {
+	tokenJwt := jwt.New(jwt.SigningMethodHS256)
+	claims := tokenJwt.Claims.(jwt.MapClaims)
+	claims["email"] = account.Email
+	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+
+	t, err := tokenJwt.SignedString([]byte(cfg.JWT_SECRET))
+	if err != nil {
+		return "", fmt.Errorf("failed to sign token: %v", err)
+	}
+	return t, nil
 }
 
 func (s *service) CreateAccount(account *entities.Account) (*entities.Account, error) {

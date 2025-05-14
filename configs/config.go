@@ -16,4 +16,7 @@ type Config struct {
 	GOOGLE_CLIENT_ID     string `env:"GOOGLE_CLIENT_ID"`
 	GOOGLE_CLIENT_SECRET string `env:"GOOGLE_CLIENT_SECRET"`
 	GOOGLE_REDIRECT_URL  string `env:"GOOGLE_REDIRECT_URL"`
+
+	// JWT Configuration
+	JWT_SECRET string `env:"JWT_SECRET"`
 }
