@@ -6,7 +6,7 @@ import (
 
 	"github.com/Ratchaphon1412/assistant-llm/configs"
 	"github.com/Ratchaphon1412/assistant-llm/pkg/entities"
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type Service interface {
