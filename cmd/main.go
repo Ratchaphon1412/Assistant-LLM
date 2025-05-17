@@ -20,9 +20,11 @@ func main() {
 	if err := env.Parse(&cfg); err != nil {
 		panic(err) //TODO: write to log
 	}
-
+	// Initialize Database
 	database.Connect(&cfg)
+
 	api := app.Group("/api")
+	websocket := app.Group("/ws")
 
 	// middleware
 	auth_middleware := jwtware.New(jwtware.Config{
@@ -30,8 +32,10 @@ func main() {
 	})
 
 	//api v1
-	v1 := api.Group("/v1")
+	apiV1 := api.Group("/v1")
+	websocketV1 := websocket.Group("/v1")
 
-	routes.AccountRouter(v1, auth_middleware, database.DB, &cfg)
+	routes.AccountRouter(apiV1, auth_middleware, database.DB, &cfg)
+	routes.ChatRouter(websocketV1, auth_middleware, database.DB, &cfg)
 	app.Listen(":" + cfg.ServerPort)
 }

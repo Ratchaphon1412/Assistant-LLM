@@ -19,4 +19,11 @@ type Config struct {
 
 	// JWT Configuration
 	JWT_SECRET string `env:"JWT_SECRET"`
+
+	// Temporal Configuration
+	TEMPORAL_HOST          string `env:"TEMPORAL_HOST"`
+	TEMPORAL_PORT          string `env:"TEMPORAL_PORT"`
+	TEMPORAL_NAMESPACE     string `env:"TEMPORAL_NAMESPACE"`
+	TEMPORAL_TASK_QUEUE    string `env:"TEMPORAL_TASK_QUEUE"`
+	TEMPORAL_WORKFLOW_NAME string `env:"TEMPORAL_WORKFLOW_NAME"`
 }
