@@ -10,7 +10,7 @@ import (
 	"go.temporal.io/sdk/temporal"
 )
 
-func AIWorkflow(cfg *configs.Config, workflowID string, input string) error {
+func AIWorkflow(ctx context.Context, cfg *configs.Config, chatID uint, redisChanel string, workflowID string, input string) error {
 	// The client is a heavyweight object that should be created once per process.
 	c, err := client.Dial(client.Options{
 		HostPort:  cfg.TEMPORAL_HOST + ":" + cfg.TEMPORAL_PORT,
@@ -33,7 +33,7 @@ func AIWorkflow(cfg *configs.Config, workflowID string, input string) error {
 		},
 	}
 
-	we, err := c.ExecuteWorkflow(context.Background(), workflowOptions, cfg.TEMPORAL_WORKFLOW_NAME, input) // Replace with your actual workflow function name and parameters
+	we, err := c.ExecuteWorkflow(ctx, workflowOptions, cfg.TEMPORAL_WORKFLOW_NAME, chatID, redisChanel, input) // Replace with your actual workflow function name and parameters
 	if err != nil {
 		log.Fatalln("Unable to execute workflow", err)
 		return err

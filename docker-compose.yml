@@ -15,6 +15,9 @@ services:
   redis:
     image: redis:latest
     container_name: redis_cache
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_MASTER_PASSWORD: ${REDIS_PASSWORD}
     ports:
       - "6379:6379"
     volumes:

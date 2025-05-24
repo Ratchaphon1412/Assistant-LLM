@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"github.com/Ratchaphon1412/assistant-llm/api/presenters"
-	"github.com/Ratchaphon1412/assistant-llm/cmd/driver/auth"
 	"github.com/Ratchaphon1412/assistant-llm/configs"
 	"github.com/Ratchaphon1412/assistant-llm/pkg/account"
 	"github.com/Ratchaphon1412/assistant-llm/pkg/entities"
@@ -12,22 +11,21 @@ import (
 
 func GoogleSignIn(service account.Service, cfg *configs.Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		path := auth.ConfigGoogle(cfg)
-		url := path.AuthCodeURL("state")
+		url, err := service.GoogleSignIn(cfg)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(presenters.AccountErrorResponse("Failed to get google sign in url", err))
+		}
 		return c.Redirect(url)
 	}
 }
 
 func GoogleCallback(service account.Service, cfg *configs.Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		token, err := auth.ConfigGoogle(cfg).Exchange(c.Context(), c.FormValue("code"))
+		userinfo, err := service.GoogleCallback(c.Context(), c.Query("code"), cfg)
 		if err != nil {
-			return c.Status(500).JSON(presenters.AccountErrorResponse("Failed to exchange token", err))
+			return c.Status(fiber.StatusBadRequest).JSON(presenters.AccountErrorResponse("Failed to get user info", err))
 		}
-		userinfo := auth.GetUserInfo(token.AccessToken)
-		if userinfo.Email == "" {
-			return c.Status(400).JSON(presenters.AccountErrorResponse("Failed to get user info", nil))
-		}
+
 		account, err := service.GetAccountByEmail(userinfo.Email)
 		if account == nil {
 			account = &entities.Account{
@@ -36,24 +34,24 @@ func GoogleCallback(service account.Service, cfg *configs.Config) fiber.Handler 
 			}
 			account, err = service.CreateAccount(account)
 			if err != nil {
-				return c.Status(500).JSON(presenters.AccountErrorResponse("Failed to create account", err))
+				return c.Status(fiber.StatusInternalServerError).JSON(presenters.AccountErrorResponse("Failed to create account", err))
 			}
 			t, err := service.SignIn(account, *cfg)
 			if err != nil {
-				return c.Status(500).JSON(presenters.AccountErrorResponse("Failed to sign in", err))
+				return c.Status(fiber.StatusInternalServerError).JSON(presenters.AccountErrorResponse("Failed to sign in", err))
 			}
-			return c.Status(200).JSON(presenters.SignGoogleCallBackResponse(account, t))
+			return c.Status(fiber.StatusOK).JSON(presenters.SignGoogleCallBackResponse(account, t))
 		} else {
 			if err != nil {
-				return c.Status(500).JSON(presenters.AccountErrorResponse("Failed to get account", err))
+				return c.Status(fiber.StatusInternalServerError).JSON(presenters.AccountErrorResponse("Failed to get account", err))
 			}
 
 			t, err := service.SignIn(account, *cfg)
 			if err != nil {
-				return c.Status(500).JSON(presenters.AccountErrorResponse("Failed to sign in", err))
+				return c.Status(fiber.StatusInternalServerError).JSON(presenters.AccountErrorResponse("Failed to sign in", err))
 
 			}
-			return c.Status(200).JSON(presenters.SignGoogleCallBackResponse(account, t))
+			return c.Status(fiber.StatusOK).JSON(presenters.SignGoogleCallBackResponse(account, t))
 
 		}
 	}
@@ -65,7 +63,7 @@ func GetAccount(service account.Service) fiber.Handler {
 		email := c.Locals("email").(string)
 		account, err := service.GetAccountByEmail(email)
 		if err != nil {
-			return c.Status(500).JSON(presenters.AccountErrorResponse("Failed to get account", err))
+			return c.Status(fiber.StatusInternalServerError).JSON(presenters.AccountErrorResponse("Failed to get account", err))
 		}
 		return c.Status(200).JSON(presenters.AccountResponse(account))
 	}

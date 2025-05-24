@@ -1,9 +1,11 @@
 package account
 
 import (
+	"context"
 	"fmt"
 	"time"
 
+	"github.com/Ratchaphon1412/assistant-llm/cmd/driver/auth"
 	"github.com/Ratchaphon1412/assistant-llm/configs"
 	"github.com/Ratchaphon1412/assistant-llm/pkg/entities"
 	"github.com/golang-jwt/jwt/v5"
@@ -17,6 +19,8 @@ type Service interface {
 	GetAccountByEmail(email string) (*entities.Account, error)
 	GetAllAccounts() ([]entities.Account, error)
 	SignIn(account *entities.Account, cfg configs.Config) (string, error)
+	GoogleSignIn(cfg *configs.Config) (string, error)
+	GoogleCallback(ctx context.Context, code string, cfg *configs.Config) (*auth.GoogleResponse, error)
 }
 
 type service struct {
@@ -59,4 +63,22 @@ func (s *service) GetAccountByEmail(email string) (*entities.Account, error) {
 }
 func (s *service) GetAllAccounts() ([]entities.Account, error) {
 	return s.repository.GetAllAccounts()
+}
+
+func (s *service) GoogleSignIn(cfg *configs.Config) (string, error) {
+	path := auth.ConfigGoogle(cfg)
+	url := path.AuthCodeURL("state")
+	return url, nil
+}
+
+func (s *service) GoogleCallback(ctx context.Context, code string, cfg *configs.Config) (*auth.GoogleResponse, error) {
+	token, err := auth.ConfigGoogle(cfg).Exchange(ctx, code)
+	if err != nil {
+		return nil, fmt.Errorf("failed to exchange token: %v", err)
+	}
+	userinfo := auth.GetUserInfo(token.AccessToken)
+	if userinfo.Email == "" {
+		return nil, fmt.Errorf("failed to get user info")
+	}
+	return &userinfo, nil
 }

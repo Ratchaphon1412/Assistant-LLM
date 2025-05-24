@@ -26,4 +26,13 @@ type Config struct {
 	TEMPORAL_NAMESPACE     string `env:"TEMPORAL_NAMESPACE"`
 	TEMPORAL_TASK_QUEUE    string `env:"TEMPORAL_TASK_QUEUE"`
 	TEMPORAL_WORKFLOW_NAME string `env:"TEMPORAL_WORKFLOW_NAME"`
+
+	// Redis Configuration
+	REDIS_ADDR string `env:"REDIS_ADDR"`
+
+	REDIS_USERNAME  string `env:"REDIS_USERNAME"`
+	REDIS_PASSWORD  string `env:"REDIS_PASSWORD"`
+	REDIS_DATABASE  int    `env:"REDIS_DATABASE"`
+	REDIS_POOLFIFO  bool   `env:"REDIS_POOLFIFO"`
+	REDIS_POOL_SIZE int    `env:"REDIS_POOL_SIZE"`
 }

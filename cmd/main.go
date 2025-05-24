@@ -23,6 +23,9 @@ func main() {
 	// Initialize Database
 	database.Connect(&cfg)
 
+	// Initialize Redis
+	database.ConnectRedis(&cfg)
+
 	api := app.Group("/api")
 	websocket := app.Group("/ws")
 
