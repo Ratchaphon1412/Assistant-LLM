@@ -46,7 +46,7 @@ func GoogleCallback(service account.Service, cfg *configs.Config) fiber.Handler 
 				Value:    "Bearer " + t,
 				HTTPOnly: cfg.JWT_HTTP_ONLY,
 				Secure:   cfg.JWT_SECURE, // แนะนำให้ใช้ true ใน production (HTTPS เท่านั้น)
-				SameSite: "Strict",
+				SameSite: "Lax",
 				Path:     "/",
 				MaxAge:   60 * 60 * 24, // 1 วัน
 			})
@@ -68,7 +68,7 @@ func GoogleCallback(service account.Service, cfg *configs.Config) fiber.Handler 
 				Value:    "Bearer " + t,
 				HTTPOnly: cfg.JWT_HTTP_ONLY,
 				Secure:   cfg.JWT_SECURE, // แนะนำให้ใช้ true ใน production (HTTPS เท่านั้น)
-				SameSite: "Strict",
+				SameSite: "Lax",
 				Path:     "/",
 				MaxAge:   60 * 60 * 24, // 1 วัน
 			})
