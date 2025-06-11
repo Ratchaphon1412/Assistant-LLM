@@ -34,24 +34,45 @@ func GoogleCallback(service account.Service, cfg *configs.Config) fiber.Handler 
 			}
 			account, err = service.CreateAccount(account)
 			if err != nil {
-				return c.Status(fiber.StatusInternalServerError).JSON(presenters.AccountErrorResponse("Failed to create account", err))
+				return c.Status(fiber.StatusInternalServerError).Redirect(cfg.CLIENT_URL)
 			}
 			t, err := service.SignIn(account, *cfg)
 			if err != nil {
-				return c.Status(fiber.StatusInternalServerError).JSON(presenters.AccountErrorResponse("Failed to sign in", err))
+				return c.Status(fiber.StatusInternalServerError).Redirect(cfg.CLIENT_URL)
 			}
-			return c.Status(fiber.StatusOK).JSON(presenters.SignGoogleCallBackResponse(account, t))
+			// Set JWT in HttpOnly cookie
+			c.Cookie(&fiber.Cookie{
+				Name:     cfg.JWT_COOKIE_NAME,
+				Value:    t,
+				HTTPOnly: cfg.JWT_HTTP_ONLY,
+				Secure:   cfg.JWT_SECURE, // แนะนำให้ใช้ true ใน production (HTTPS เท่านั้น)
+				SameSite: "Strict",
+				Path:     "/",
+				MaxAge:   60 * 60 * 24, // 1 วัน
+			})
+
+			return c.Status(fiber.StatusOK).Redirect(cfg.CLIENT_URL + "/chat")
 		} else {
 			if err != nil {
-				return c.Status(fiber.StatusInternalServerError).JSON(presenters.AccountErrorResponse("Failed to get account", err))
+				return c.Status(fiber.StatusInternalServerError).Redirect(cfg.CLIENT_URL)
 			}
 
 			t, err := service.SignIn(account, *cfg)
 			if err != nil {
-				return c.Status(fiber.StatusInternalServerError).JSON(presenters.AccountErrorResponse("Failed to sign in", err))
+				return c.Status(fiber.StatusInternalServerError).Redirect(cfg.CLIENT_URL)
 
 			}
-			return c.Status(fiber.StatusOK).JSON(presenters.SignGoogleCallBackResponse(account, t))
+			// Set JWT in HttpOnly cookie
+			c.Cookie(&fiber.Cookie{
+				Name:     cfg.JWT_COOKIE_NAME,
+				Value:    t,
+				HTTPOnly: cfg.JWT_HTTP_ONLY,
+				Secure:   cfg.JWT_SECURE, // แนะนำให้ใช้ true ใน production (HTTPS เท่านั้น)
+				SameSite: "Strict",
+				Path:     "/",
+				MaxAge:   60 * 60 * 24, // 1 วัน
+			})
+			return c.Status(fiber.StatusOK).Redirect(cfg.CLIENT_URL + "/chat")
 
 		}
 	}

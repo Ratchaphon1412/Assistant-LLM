@@ -3,6 +3,7 @@ package configs
 type Config struct {
 	// Server Configuration
 	ServerPort string `env:"SERVER_PORT" envDefault:"8000"`
+	CLIENT_URL string `env:"CLIENT_URL"`
 	// Database Configuration
 	DB_HOST     string `env:"DB_HOST"`
 	DB_PORT     string `env:"DB_PORT"`
@@ -18,7 +19,10 @@ type Config struct {
 	GOOGLE_REDIRECT_URL  string `env:"GOOGLE_REDIRECT_URL"`
 
 	// JWT Configuration
-	JWT_SECRET string `env:"JWT_SECRET"`
+	JWT_SECRET      string `env:"JWT_SECRET"`
+	JWT_COOKIE_NAME string `env:"JWT_COOKIE_NAME"`
+	JWT_SECURE      bool   `env:"JWT_SECURE"`
+	JWT_HTTP_ONLY   bool   `env:"JWT_HTTP_ONLY"`
 
 	// Temporal Configuration
 	TEMPORAL_HOST          string `env:"TEMPORAL_HOST"`
