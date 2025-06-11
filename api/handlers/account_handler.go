@@ -23,7 +23,7 @@ func GoogleCallback(service account.Service, cfg *configs.Config) fiber.Handler 
 	return func(c *fiber.Ctx) error {
 		userinfo, err := service.GoogleCallback(c.Context(), c.Query("code"), cfg)
 		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(presenters.AccountErrorResponse("Failed to get user info", err))
+			return c.Redirect(cfg.CLIENT_URL)
 		}
 
 		account, err := service.GetAccountByEmail(userinfo.Email)
@@ -34,11 +34,11 @@ func GoogleCallback(service account.Service, cfg *configs.Config) fiber.Handler 
 			}
 			account, err = service.CreateAccount(account)
 			if err != nil {
-				return c.Status(fiber.StatusInternalServerError).Redirect(cfg.CLIENT_URL)
+				return c.Redirect(cfg.CLIENT_URL)
 			}
 			t, err := service.SignIn(account, *cfg)
 			if err != nil {
-				return c.Status(fiber.StatusInternalServerError).Redirect(cfg.CLIENT_URL)
+				return c.Redirect(cfg.CLIENT_URL)
 			}
 			// Set JWT in HttpOnly cookie
 			c.Cookie(&fiber.Cookie{
@@ -51,15 +51,15 @@ func GoogleCallback(service account.Service, cfg *configs.Config) fiber.Handler 
 				MaxAge:   60 * 60 * 24, // 1 วัน
 			})
 
-			return c.Status(fiber.StatusOK).Redirect(cfg.CLIENT_URL + "/chat")
+			return c.Redirect(cfg.CLIENT_URL + "/chat")
 		} else {
 			if err != nil {
-				return c.Status(fiber.StatusInternalServerError).Redirect(cfg.CLIENT_URL)
+				return c.Redirect(cfg.CLIENT_URL)
 			}
 
 			t, err := service.SignIn(account, *cfg)
 			if err != nil {
-				return c.Status(fiber.StatusInternalServerError).Redirect(cfg.CLIENT_URL)
+				return c.Redirect(cfg.CLIENT_URL)
 
 			}
 			// Set JWT in HttpOnly cookie
@@ -72,7 +72,7 @@ func GoogleCallback(service account.Service, cfg *configs.Config) fiber.Handler 
 				Path:     "/",
 				MaxAge:   60 * 60 * 24, // 1 วัน
 			})
-			return c.Status(fiber.StatusOK).Redirect(cfg.CLIENT_URL + "/chat")
+			return c.Redirect(cfg.CLIENT_URL + "/chat")
 
 		}
 	}
