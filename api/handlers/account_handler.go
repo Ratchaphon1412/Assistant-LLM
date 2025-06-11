@@ -43,7 +43,7 @@ func GoogleCallback(service account.Service, cfg *configs.Config) fiber.Handler 
 			// Set JWT in HttpOnly cookie
 			c.Cookie(&fiber.Cookie{
 				Name:     cfg.JWT_COOKIE_NAME,
-				Value:    t,
+				Value:    "Bearer " + t,
 				HTTPOnly: cfg.JWT_HTTP_ONLY,
 				Secure:   cfg.JWT_SECURE, // แนะนำให้ใช้ true ใน production (HTTPS เท่านั้น)
 				SameSite: "Strict",
