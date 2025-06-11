@@ -16,10 +16,11 @@ var cfg configs.Config
 
 func main() {
 	app := fiber.New()
-	configs.AppSettings(app)
+
 	if err := env.Parse(&cfg); err != nil {
 		panic(err) //TODO: write to log
 	}
+	configs.AppSettings(app, &cfg)
 	// Initialize Database
 	database.Connect(&cfg)
 
