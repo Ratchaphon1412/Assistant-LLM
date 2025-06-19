@@ -12,6 +12,6 @@ import (
 func AccountRouter(app fiber.Router, auth_middleware fiber.Handler, db database.Dbinstance, cfg *configs.Config) {
 	accountService := account.NewService(account.NewRepository(db.Db))
 	app.Get("/auth/google", handlers.GoogleSignIn(accountService, cfg))
-	app.Get("/auth/google/callback", handlers.GoogleCallback(accountService, cfg))
+	app.Post("/auth/google/callback", handlers.GoogleCallback(accountService, cfg))
 	app.Get("/account", auth_middleware, middlewares.ExtractToken, handlers.GetAccount(accountService))
 }

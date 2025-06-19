@@ -9,6 +9,10 @@ import (
 	// "errors"
 )
 
+type GoogleCallBackRequest struct {
+	Code string `json:"code"`
+}
+
 func GoogleSignIn(service account.Service, cfg *configs.Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		url, err := service.GoogleSignIn(cfg)
@@ -21,9 +25,13 @@ func GoogleSignIn(service account.Service, cfg *configs.Config) fiber.Handler {
 
 func GoogleCallback(service account.Service, cfg *configs.Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		userinfo, err := service.GoogleCallback(c.Context(), c.Query("code"), cfg)
+		var request GoogleCallBackRequest
+		if err := c.BodyParser(&request); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(presenters.AccountErrorResponse("Invalid request body", err))
+		}
+		userinfo, err := service.GoogleCallback(c.Context(), request.Code, cfg)
 		if err != nil {
-			return c.Redirect(cfg.CLIENT_URL)
+			return c.Status(fiber.StatusInternalServerError).JSON(presenters.AccountErrorResponse("Failed to get user info", err))
 		}
 
 		account, err := service.GetAccountByEmail(userinfo.Email)
@@ -34,45 +42,26 @@ func GoogleCallback(service account.Service, cfg *configs.Config) fiber.Handler 
 			}
 			account, err = service.CreateAccount(account)
 			if err != nil {
-				return c.Redirect(cfg.CLIENT_URL)
+				return c.Status(fiber.StatusInternalServerError).JSON(presenters.AccountErrorResponse("Failed to create account", err))
 			}
 			t, err := service.SignIn(account, *cfg)
 			if err != nil {
-				return c.Redirect(cfg.CLIENT_URL)
+				return c.Status(fiber.StatusInternalServerError).JSON(presenters.AccountErrorResponse("Failed to sign in", err))
 			}
-			// Set JWT in HttpOnly cookie
-			c.Cookie(&fiber.Cookie{
-				Name:     cfg.JWT_COOKIE_NAME,
-				Value:    t,
-				HTTPOnly: cfg.JWT_HTTP_ONLY,
-				Secure:   cfg.JWT_SECURE, // แนะนำให้ใช้ true ใน production (HTTPS เท่านั้น)
-				SameSite: "Lax",
-				Path:     "/",
-				MaxAge:   60 * 60 * 24, // 1 วัน
-			})
 
-			return c.Redirect(cfg.CLIENT_URL + "/chat")
+			return c.Status(fiber.StatusCreated).JSON(presenters.SignGoogleCallBackResponse(account, t))
 		} else {
 			if err != nil {
-				return c.Redirect(cfg.CLIENT_URL)
+				return c.Status(fiber.StatusInternalServerError).JSON(presenters.AccountErrorResponse("Failed to get account", err))
 			}
 
 			t, err := service.SignIn(account, *cfg)
 			if err != nil {
-				return c.Redirect(cfg.CLIENT_URL)
+				return c.Status(fiber.StatusInternalServerError).JSON(presenters.AccountErrorResponse("Failed to sign in", err))
 
 			}
-			// Set JWT in HttpOnly cookie
-			c.Cookie(&fiber.Cookie{
-				Name:     cfg.JWT_COOKIE_NAME,
-				Value:    t,
-				HTTPOnly: cfg.JWT_HTTP_ONLY,
-				Secure:   cfg.JWT_SECURE, // แนะนำให้ใช้ true ใน production (HTTPS เท่านั้น)
-				SameSite: "Lax",
-				Path:     "/",
-				MaxAge:   60 * 60 * 24, // 1 วัน
-			})
-			return c.Redirect(cfg.CLIENT_URL + "/chat")
+
+			return c.Status(fiber.StatusCreated).JSON(presenters.SignGoogleCallBackResponse(account, t))
 
 		}
 	}
