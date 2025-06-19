@@ -32,8 +32,8 @@ func main() {
 
 	// middleware
 	auth_middleware := jwtware.New(jwtware.Config{
-		SigningKey:  jwtware.SigningKey{Key: []byte(cfg.JWT_SECRET)},
-		TokenLookup: "cookie:" + cfg.JWT_COOKIE_NAME,
+		SigningKey: jwtware.SigningKey{Key: []byte(cfg.JWT_SECRET)},
+		// TokenLookup: "cookie:" + cfg.JWT_COOKIE_NAME,
 	})
 
 	//api v1
