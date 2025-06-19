@@ -51,7 +51,7 @@ func GoogleCallback(service account.Service, cfg *configs.Config) fiber.Handler 
 				MaxAge:   60 * 60 * 24, // 1 วัน
 			})
 
-			return c.Status(fiber.StatusCreated).JSON(presenters.AccountResponse(account))
+			return c.Redirect(cfg.CLIENT_URL + "/chat")
 		} else {
 			if err != nil {
 				return c.Redirect(cfg.CLIENT_URL)
@@ -72,7 +72,7 @@ func GoogleCallback(service account.Service, cfg *configs.Config) fiber.Handler 
 				Path:     "/",
 				MaxAge:   60 * 60 * 24, // 1 วัน
 			})
-			return c.Status(fiber.StatusOK).JSON(presenters.AccountResponse(account))
+			return c.Redirect(cfg.CLIENT_URL + "/chat")
 
 		}
 	}
