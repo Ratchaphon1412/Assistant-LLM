@@ -22,3 +22,15 @@ services:
       - "6379:6379"
     volumes:
       - ./redis_data:/data
+  postgresql:
+    container_name: temporal-postgresql-assistant-llm
+    environment:
+      POSTGRES_PASSWORD: temporal
+      POSTGRES_USER: temporal
+    image: postgres:${POSTGRESQL_VERSION}
+    networks:
+      - temporal-network
+    ports:
+      - 5432:5432
+    volumes:
+      - /var/lib/postgresql/data

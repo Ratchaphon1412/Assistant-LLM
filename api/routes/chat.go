@@ -11,6 +11,6 @@ import (
 
 func ChatRouter(app fiber.Router, auth_middleware fiber.Handler, db database.Dbinstance, cfg *configs.Config) {
 	chatService := chat.NewService(chat.NewRepository(db.Db))
-	app.Get("/chat", auth_middleware, middlewares.ExtractToken, middlewares.UpgradeRequest, handlers.CreateChat(chatService, cfg))
+	app.Get("/chat", middlewares.LoggerRequest(cfg), auth_middleware, middlewares.ExtractToken, middlewares.UpgradeRequest, handlers.CreateChat(chatService, cfg))
 
 }

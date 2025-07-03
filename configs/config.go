@@ -39,4 +39,8 @@ type Config struct {
 	REDIS_DATABASE  int    `env:"REDIS_DATABASE"`
 	REDIS_POOLFIFO  bool   `env:"REDIS_POOLFIFO"`
 	REDIS_POOL_SIZE int    `env:"REDIS_POOL_SIZE"`
+
+	// OpenWeather
+	OPEN_WEATHER_MAP_API_KEY string `env:"OPEN_WEATHER_MAP_API_KEY"`
+	OPEN_WEATHER_MAP_URL     string `env:"OPEN_WEATHER_MAP_URL"`
 }

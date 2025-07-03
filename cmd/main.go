@@ -42,5 +42,6 @@ func main() {
 
 	routes.AccountRouter(apiV1, auth_middleware, database.DB, &cfg)
 	routes.ChatRouter(websocketV1, auth_middleware, database.DB, &cfg)
+	routes.WeatherRouter(apiV1, auth_middleware, database.DB, &cfg)
 	app.Listen(":" + cfg.ServerPort)
 }
