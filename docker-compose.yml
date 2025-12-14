@@ -27,10 +27,9 @@ services:
     environment:
       POSTGRES_PASSWORD: temporal
       POSTGRES_USER: temporal
+      PGPORT: 5435
     image: postgres:${POSTGRESQL_VERSION}
-    networks:
-      - temporal-network
     ports:
-      - 5432:5432
+      - 5435:5435
     volumes:
       - /var/lib/postgresql/data
