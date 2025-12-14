@@ -1,1 +1,25 @@
-./db_data
+# Git
+.git
+.gitignore
+
+# Environment variables
+.env
+
+# Docker
+docker-compose.yml
+dockerfile
+.dockerignore
+
+# Documentation
+README.md
+*.md
+
+# Editor directories and files
+.idea
+.vscode
+*.swp
+*.swo
+
+# Go
+db_data
+redis_data
